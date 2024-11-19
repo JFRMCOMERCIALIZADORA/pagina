@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Productos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f9;
+            padding: 20px;
+        }
+        form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            margin-top: 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .button-container {
+            display: flex;
+            gap: 10px;
+            flex-wrap: nowrap;
+            margin-bottom: 20px;
+        }
+        .button-container button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .button-container button:hover {
+            background-color: #0056b3;
+        }
+        .product-list {
+            margin-top: 20px;
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
+        .product {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .product p {
+            margin: 0 15px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+        .edit-button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: background-color 0.3s;
+        }
+        .edit-button:hover {
+            background-color: #218838;
+        }
+        .delete-button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: background-color 0.3s;
+        }
+        .delete-button:hover {
+            background-color: #c82333;
+        }
+        .back-button {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            margin-top: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .back-button:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+<div class="button-container">
+        <button onclick="location.href='cotizar.html'">Cotizar</button>
+        <button onclick="location.href='clientes.html'">Clientes</button>
+        <button onclick="location.href='cotizaciones.html'">Cotizaciones</button>
+        <button onclick="location.href='productos.html'">Productos</button>
+    </div>
+    <h1>Crear Producto</h1>
+
+    <form id="productForm">
+        <label for="productName">Nombre del Producto:</label>
+        <input type="text" id="productName" required>
+
+        <label for="productPrice">Precio Neto:</label>
+        <input type="number" id="productPrice" step="0.01" required>
+
+        <button type="submit">Guardar Producto</button>
+        <button type="button" class="back-button" onclick="location.href='paginaprincipal.html'">Volver a la página principal</button>
+    </form>
+
+    <div class="product-list" id="productList"></div>
+
+    <script>
+        document.getElementById('productForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Evita el envío del formulario
+
+            // Obtener los valores del formulario
+            const productName = document.getElementById('productName').value;
+            let productPrice = parseFloat(document.getElementById('productPrice').value).toFixed(2);
+
+            // Obtener los productos guardados en LocalStorage
+            let products = JSON.parse(localStorage.getItem('products')) || [];
+
+            // Generar un nuevo ID basado en el número de productos actuales
+            const newId = products.length > 0 ? products[products.length - 1].id + 1 : 1;
+
+            // Crear un objeto producto
+            const product = {
+                id: newId,
+                name: productName,
+                price: productPrice
+            };
+
+            // Agregar el nuevo producto
+            products.push(product);
+
+            // Guardar los productos nuevamente en LocalStorage
+            localStorage.setItem('products', JSON.stringify(products));
+
+            // Limpiar el formulario
+            document.getElementById('productForm').reset();
+
+            // Confirmación visual
+            alert('Producto guardado exitosamente!');
+
+            // Actualizar la lista de productos
+            displayProducts();
+        });
+
+        function displayProducts() {
+            const productList = document.getElementById('productList');
+            productList.innerHTML = '';
+
+            let products = JSON.parse(localStorage.getItem('products')) || [];
+
+            products.forEach((product, index) => {
+                const productDiv = document.createElement('div');
+                productDiv.classList.add('product');
+                productDiv.innerHTML = `
+                    <p><strong>ID:</strong> ${product.id}</p>
+                    <p><strong>Nombre:</strong> ${product.name}</p>
+                    <p><strong>Precio Neto:</strong> $${product.price}</p>
+                    <div class="button-group">
+                        <button class="edit-button" onclick="editProduct(${index})">Editar</button>
+                        <button class="delete-button" onclick="deleteProduct(${index})">Eliminar</button>
+                    </div>
+                `;
+                productList.appendChild(productDiv);
+            });
+        }
+
+        function editProduct(index) {
+            let products = JSON.parse(localStorage.getItem('products')) || [];
+            const product = products[index];
+
+            // Llenar el formulario con los datos del producto para editar
+            document.getElementById('productName').value = product.name;
+            document.getElementById('productPrice').value = parseFloat(product.price).toFixed(2);
+
+            // Eliminar el producto actual para actualizarlo
+            products.splice(index, 1);
+            localStorage.setItem('products', JSON.stringify(products));
+        }
+
+        function deleteProduct(index) {
+            let products = JSON.parse(localStorage.getItem('products')) || [];
+            products.splice(index, 1);
+            localStorage.setItem('products', JSON.stringify(products));
+            displayProducts();
+        }
+
+        // Mostrar los productos al cargar la página
+        window.onload = function() {
+            displayProducts();
+        };
+    </script>
+</body>
+</html>
+

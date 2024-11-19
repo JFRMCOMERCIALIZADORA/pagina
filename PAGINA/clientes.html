@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Clientes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f9;
+            padding: 20px;
+        }
+        form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            margin-top: 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .button-container {
+            display: flex;
+            gap: 10px;
+            flex-wrap: nowrap;
+            margin-bottom: 20px;
+        }
+        .button-container button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .button-container button:hover {
+            background-color: #0056b3;
+        }
+        .client-list {
+            margin-top: 20px;
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
+        .client {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .client p {
+            margin: 0 15px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+        .edit-button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: background-color 0.3s;
+        }
+        .edit-button:hover {
+            background-color: #218838;
+        }
+        .delete-button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: background-color 0.3s;
+        }
+        .delete-button:hover {
+            background-color: #c82333;
+        }
+        .back-button {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            margin-top: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .back-button:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <div class="button-container">
+        <button onclick="location.href='cotizar.html'">Cotizar</button>
+        <button onclick="location.href='clientes.html'">Clientes</button>
+        <button onclick="location.href='cotizaciones.html'">Cotizaciones</button>
+        <button onclick="location.href='productos.html'">Productos</button>
+    </div>
+    <h1>Crear Cliente</h1>
+
+    <form id="clientForm">
+        <label for="clientRut">RUT del Cliente:</label>
+        <input type="text" id="clientRut" required>
+
+        <label for="clientName">Nombre del Cliente:</label>
+        <input type="text" id="clientName" required>
+
+        <label for="clientEmail">Correo Electrónico:</label>
+        <input type="email" id="clientEmail" required>
+
+        <button type="submit">Guardar Cliente</button>
+        <button type="button" class="back-button" onclick="location.href='paginaprincipal.html'">Volver a la página principal</button>
+    </form>
+
+    <div class="client-list" id="clientList"></div>
+
+    <script>
+        document.getElementById('clientForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Evita el envío del formulario
+
+            // Obtener los valores del formulario
+            const clientRut = document.getElementById('clientRut').value;
+            const clientName = document.getElementById('clientName').value;
+            const clientEmail = document.getElementById('clientEmail').value;
+
+            // Obtener los clientes guardados en LocalStorage
+            let clients = JSON.parse(localStorage.getItem('clients')) || [];
+
+            // Verificar si el cliente ya existe
+            const clientExists = clients.some(existingClient => existingClient.rut === clientRut || existingClient.email === clientEmail);
+            if (clientExists) {
+                alert('El cliente con este RUT o correo electrónico ya está registrado.');
+                return;
+            }
+
+            // Crear un objeto cliente
+            const client = {
+                rut: clientRut,
+                name: clientName,
+                email: clientEmail
+            };
+
+            // Agregar el nuevo cliente
+            clients.push(client);
+
+            // Guardar los clientes nuevamente en LocalStorage
+            localStorage.setItem('clients', JSON.stringify(clients));
+
+            // Limpiar el formulario
+            document.getElementById('clientForm').reset();
+
+            // Confirmación visual
+            alert('Cliente guardado exitosamente!');
+
+            // Actualizar la lista de clientes
+            displayClients();
+        });
+
+        function displayClients() {
+            const clientList = document.getElementById('clientList');
+            clientList.innerHTML = '';
+
+            let clients = JSON.parse(localStorage.getItem('clients')) || [];
+
+            clients.forEach((client, index) => {
+                const clientDiv = document.createElement('div');
+                clientDiv.classList.add('client');
+                clientDiv.innerHTML = `
+                    <p><strong>RUT:</strong> ${client.rut}</p>
+                    <p><strong>Nombre:</strong> ${client.name}</p>
+                    <p><strong>Correo Electrónico:</strong> ${client.email}</p>
+                    <div class="button-group">
+                        <button class="edit-button" onclick="editClient(${index})">Editar</button>
+                        <button class="delete-button" onclick="deleteClient(${index})">Eliminar</button>
+                    </div>
+                `;
+                clientList.appendChild(clientDiv);
+            });
+        }
+
+        function editClient(index) {
+            let clients = JSON.parse(localStorage.getItem('clients')) || [];
+            const client = clients[index];
+
+            // Llenar el formulario con los datos del cliente para editar
+            document.getElementById('clientRut').value = client.rut;
+            document.getElementById('clientName').value = client.name;
+            document.getElementById('clientEmail').value = client.email;
+
+            // Eliminar el cliente actual para actualizarlo
+            clients.splice(index, 1);
+            localStorage.setItem('clients', JSON.stringify(clients));
+        }
+
+        function deleteClient(index) {
+            let clients = JSON.parse(localStorage.getItem('clients')) || [];
+            clients.splice(index, 1);
+            localStorage.setItem('clients', JSON.stringify(clients));
+            displayClients();
+        }
+
+        // Mostrar los clientes al cargar la página
+        window.onload = function() {
+            displayClients();
+        };
+    </script>
+</body>
+</html>
+
+
